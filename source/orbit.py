@@ -6,6 +6,12 @@ class Orbit():
     def __init__(self):
         self._p = Physics()
 
+    def semi_major_axis(self, k, Energy):
+        return -(k/(2*Energy))
+    
+    def period(self, k, semi_major_axis):
+        T = ((2*np.pi) / np.sqrt(k)) * semi_major_axis**(3/2)
+        return T
 
     def eccentricity(self, velocity, relative, angular_momentum, k):
         e = (np.cross(velocity, angular_momentum) / k) - (relative / self._p.mag(relative))
@@ -52,6 +58,28 @@ class Orbit():
             theta = 2 * np.pi - np.arccos(eccr / er)
         
         return theta
+    
+    def mean_anomaly(self, period, t):
+        return ((2*np.pi) / period) * t
+    
+    def eccentric_anomaly(self, mean_anomaly, eccentricity):
+        if mean_anomaly< np.pi:
+            E = mean_anomaly + eccentricity/2
+        else:
+            E = mean_anomaly - eccentricity/2
+        
+        ratio = 1
+        total_error = 1e-8
+
+        while abs(ratio) > total_error:
+            ratio = (E - eccentricity * np.sin(E) - mean_anomaly) / (1 - eccentricity * np.cos(E))
+            E = E - ratio
+        
+        return E
+    
+    def perifocal_rotation(self, periapsis):
+        Rom = np.array([[np.cos(periapsis), np.sin(periapsis), 0], [-(np.sin(periapsis)), np.cos(periapsis), 0], [0,0,1]])
+        return Rom
 
 
 if __name__ == "__main__":

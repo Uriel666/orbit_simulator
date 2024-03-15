@@ -20,6 +20,7 @@ class Physics():
     def radial_velocity(self, position, velocity, mag_position):
         return np.dot(position, velocity) / mag_position
     
+    
     def mag(self, a):
         return np.sqrt(np.dot(a,a))
 
